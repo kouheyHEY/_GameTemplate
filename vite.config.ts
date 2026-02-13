@@ -12,11 +12,26 @@ export default defineConfig(({ command, mode }) => {
                 electron([
                     {
                         entry: "electron/main.ts",
+                        onstart(options) {
+                            // Electronプロセスを起動
+                            options.startup();
+                        },
+                        vite: {
+                            build: {
+                                outDir: "dist-electron",
+                            },
+                        },
                     },
                     {
                         entry: "electron/preload.ts",
                         onstart(options) {
+                            // レンダラープロセスをリロード
                             options.reload();
+                        },
+                        vite: {
+                            build: {
+                                outDir: "dist-electron",
+                            },
                         },
                     },
                 ]),

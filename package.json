@@ -3,14 +3,17 @@
     "private": true,
     "version": "1.0.0",
     "description": "A generic Phaser 3 game template.",
+    "main": "dist-electron/main.js",
     "scripts": {
         "dev": "vite",
+        "dev:desktop": "vite --mode electron",
         "build": "vite build",
-        "preview": "vite preview",
-        "dev:electron": "cross-env VITE_MODE=electron vite",
-        "build:electron": "cross-env VITE_MODE=electron vite build && electron-builder"
+        "build:desktop:win": "vite build --mode electron && electron-builder --win",
+        "build:desktop": "vite build --mode electron && electron-builder",
+        "preview": "vite preview"
     },
     "devDependencies": {
+        "concurrently": "^9.2.1",
         "cross-env": "^7.0.3",
         "electron": "^40.1.0",
         "electron-builder": "^26.4.0",
@@ -22,5 +25,26 @@
     },
     "dependencies": {
         "phaser": "^3.80.0"
+    },
+    "build": {
+        "appId": "com.mygame.template",
+        "productName": "MyGameTemplate",
+        "directories": {
+            "output": "release"
+        },
+        "files": [
+            "dist/**/*",
+            "dist-electron/**/*",
+            "node_modules/**/*"
+        ],
+        "win": {
+            "target": "nsis"
+        },
+        "mac": {
+            "target": "dmg"
+        },
+        "linux": {
+            "target": "AppImage"
+        }
     }
 }
