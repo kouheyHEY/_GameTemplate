@@ -1,3 +1,4 @@
+import "./style.css";
 import Phaser from "phaser";
 import { GameConfig } from "./config/GameConfig";
 import PreloadScene from "./game/scenes/PreloadScene";
