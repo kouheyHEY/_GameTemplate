@@ -19,6 +19,7 @@ export default class GameScene extends BaseScene {
 
         // 背景グラデーション
         const graphics = this.add.graphics();
+        // fillGradientStyle(topLeft, topRight, bottomLeft, bottomRight, alpha)
         graphics.fillGradientStyle(0x0f3460, 0x0f3460, 0x16213e, 0x16213e, 1);
         graphics.fillRect(0, 0, width, height);
 
@@ -26,7 +27,7 @@ export default class GameScene extends BaseScene {
         this.add
             .text(width / 2, 50, "GAME SCENE", {
                 fontSize: "48px",
-                color: "#e94560",
+                color: "#ffffff",
                 fontStyle: "bold",
             })
             .setOrigin(0.5);
@@ -35,7 +36,7 @@ export default class GameScene extends BaseScene {
         this.scoreText = this.add
             .text(width / 2, 120, `Score: ${this.score}`, {
                 fontSize: "32px",
-                color: "#bbe1fa",
+                color: "#ffffff",
             })
             .setOrigin(0.5);
 
@@ -50,7 +51,7 @@ export default class GameScene extends BaseScene {
                 "Click the circles to increase score!",
                 {
                     fontSize: "20px",
-                    color: "#bbe1fa",
+                    color: "#ffffff",
                 },
             )
             .setOrigin(0.5);

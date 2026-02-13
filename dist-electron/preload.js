@@ -1,7 +1,13 @@
 "use strict";
 const electron = require("electron");
 electron.contextBridge.exposeInMainWorld("electronAPI", {
-  sendMessage: (message) => electron.ipcRenderer.send("message", message),
-  onReceiveMessage: (callback) => electron.ipcRenderer.on("reply", callback)
+  // アプリバージョン取得
+  getAppVersion: () => electron.ipcRenderer.invoke("get-app-version"),
+  // ランキング関連API
+  ranking: {
+    getAll: () => electron.ipcRenderer.invoke("ranking:get-all"),
+    addEntry: (entry) => electron.ipcRenderer.invoke("ranking:add-entry", entry),
+    clear: () => electron.ipcRenderer.invoke("ranking:clear")
+  }
 });
-console.log("Preload script loaded");
+console.log("[Preload] Preload script loaded");

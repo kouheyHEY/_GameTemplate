@@ -16,6 +16,7 @@ export default class TitleScene extends BaseScene {
 
         // 背景グラデーション
         const graphics = this.add.graphics();
+        // fillGradientStyle(topLeft, topRight, bottomLeft, bottomRight, alpha)
         graphics.fillGradientStyle(0x1a1a2e, 0x1a1a2e, 0x16213e, 0x16213e, 1);
         graphics.fillRect(0, 0, width, height);
 
@@ -23,7 +24,7 @@ export default class TitleScene extends BaseScene {
         const title = this.add
             .text(width / 2, height / 3, "GAME TEMPLATE", {
                 fontSize: "64px",
-                color: "#0f4c75",
+                color: "#ffffff",
                 fontStyle: "bold",
             })
             .setOrigin(0.5);
@@ -42,7 +43,7 @@ export default class TitleScene extends BaseScene {
         this.add
             .text(width / 2, height / 3 + 80, "Phaser 3 + Electron Template", {
                 fontSize: "24px",
-                color: "#3282b8",
+                color: "#ffffff",
             })
             .setOrigin(0.5);
 
@@ -60,7 +61,7 @@ export default class TitleScene extends BaseScene {
                 "Click START to begin | Press SPACE to start",
                 {
                     fontSize: "16px",
-                    color: "#bbe1fa",
+                    color: "#ffffff",
                 },
             )
             .setOrigin(0.5);

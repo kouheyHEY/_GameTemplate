@@ -1,52 +1,135 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
+import { fileURLToPath } from "url";
+import isDev from "electron-is-dev";
+import fs from "fs";
 
-// The built directory structure
-//
-// ├─┬ dist-electron
-// │ ├─┬ main
-// │ │ └── index.js    > Electron-Main
-// │ └─┬ preload
-// │   └── index.js    > Preload-Scripts
-// ├─┬ dist
-// │ └── index.html    > Electron-Renderer
-//
-process.env.DIST = path.join(__dirname, "../dist");
-process.env.PUBLIC = app.isPackaged
-    ? process.env.DIST
-    : path.join(__dirname, "../public");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-let win: BrowserWindow | null;
-// 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
-const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
+let mainWindow: BrowserWindow | null = null;
+
+// ランキングエントリーの型定義
+interface RankingEntry {
+    score: number;
+    date: string;
+    playerName?: string;
+}
+
+// ランキングデータストレージクラス
+class RankingStorage {
+    private filePath: string;
+
+    constructor() {
+        const userDataPath = app.getPath("userData");
+        this.filePath = path.join(userDataPath, "rankings.json");
+        console.log(`[RankingStorage] Data file path: ${this.filePath}`);
+    }
+
+    getRankings(): RankingEntry[] {
+        try {
+            if (fs.existsSync(this.filePath)) {
+                const data = fs.readFileSync(this.filePath, "utf-8");
+                return JSON.parse(data);
+            }
+        } catch (error) {
+            console.error("[RankingStorage] Failed to read rankings:", error);
+        }
+        return [];
+    }
+
+    setRankings(rankings: RankingEntry[]): void {
+        try {
+            fs.writeFileSync(
+                this.filePath,
+                JSON.stringify(rankings, null, 2),
+                "utf-8",
+            );
+        } catch (error) {
+            console.error("[RankingStorage] Failed to write rankings:", error);
+        }
+    }
+
+    clearRankings(): void {
+        try {
+            if (fs.existsSync(this.filePath)) {
+                fs.unlinkSync(this.filePath);
+            }
+        } catch (error) {
+            console.error("[RankingStorage] Failed to clear rankings:", error);
+        }
+    }
+}
+
+let rankingStorage: RankingStorage;
 
 function createWindow() {
-    win = new BrowserWindow({
+    // プリロードスクリプトのパス
+    const preloadPath = path.join(__dirname, "preload.js");
+
+    mainWindow = new BrowserWindow({
         width: 1280,
         height: 720,
-        icon: path.join(process.env.PUBLIC || "", "electron-vite.svg"),
+        useContentSize: true, // コンテンツエリアのサイズを正確に指定
+        resizable: true,
         webPreferences: {
-            preload: path.join(__dirname, "preload.js"),
+            preload: preloadPath,
             nodeIntegration: false,
             contextIsolation: true,
         },
     });
 
-    // Test active push message to Renderer-process.
-    win.webContents.on("did-finish-load", () => {
-        win?.webContents.send(
-            "main-process-message",
-            new Date().toLocaleString(),
-        );
+    if (isDev) {
+        // 開発モード: Vite開発サーバーに接続
+        const VITE_DEV_SERVER_URL =
+            process.env["VITE_DEV_SERVER_URL"] || "http://localhost:5173";
+        mainWindow.loadURL(VITE_DEV_SERVER_URL);
+        mainWindow.webContents.openDevTools();
+    } else {
+        // 本番モード: ビルド済みファイルを読み込み
+        mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
+    }
+
+    mainWindow.on("closed", () => {
+        mainWindow = null;
+    });
+}
+
+// IPCハンドラーを設定
+function setupIpcHandlers() {
+    // アプリバージョン取得
+    ipcMain.handle("get-app-version", () => {
+        return app.getVersion();
     });
 
-    if (VITE_DEV_SERVER_URL) {
-        win.loadURL(VITE_DEV_SERVER_URL);
-    } else {
-        // win.loadFile('dist/index.html')
-        win.loadFile(path.join(process.env.DIST || "", "index.html"));
-    }
+    // ランキング関連のIPCハンドラー
+    ipcMain.handle("ranking:get-all", () => {
+        return rankingStorage.getRankings();
+    });
+
+    ipcMain.handle("ranking:add-entry", (_event, entry: RankingEntry) => {
+        const rankings = rankingStorage.getRankings();
+        rankings.push(entry);
+        // スコア順にソート（降順）
+        rankings.sort((a, b) => b.score - a.score);
+        // 上位50件のみ保持
+        const MAX_RANKING_ENTRIES = 50;
+        const topEntries = rankings.slice(0, MAX_RANKING_ENTRIES);
+        rankingStorage.setRankings(topEntries);
+        return topEntries;
+    });
+
+    ipcMain.handle("ranking:clear", () => {
+        rankingStorage.clearRankings();
+        return true;
+    });
 }
+
+app.on("ready", () => {
+    rankingStorage = new RankingStorage();
+    setupIpcHandlers();
+    createWindow();
+});
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {
@@ -55,9 +138,7 @@ app.on("window-all-closed", () => {
 });
 
 app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
+    if (mainWindow === null) {
         createWindow();
     }
 });
-
-app.whenReady().then(createWindow);
