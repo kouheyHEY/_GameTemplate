@@ -1,82 +1,70 @@
 # チュートリアルシステム
 
-Phaser 3用の汎用チュートリアルシステムの仕様と使い方です。
+Phaser 3用の汎用的なチュートリアルシステム。指定した領域のみを操作可能にし、ステップごとにガイドを表示します。
 
-## 概要
+## 特徴
 
-画面の一部をスポットライトで強調し、操作を誘導するシステムです。
-状態管理 (State Pattern) とイベント駆動 (Observer Pattern) を採用しており、ゲームロジックと疎結合になっています。
+- ✅ **スポットライト機能**: 指定領域のみ操作可能、他は黒いオーバーレイで覆う
+- ✅ **自動位置調整**: モーダルがスポットライトと重ならないよう自動配置
+- ✅ **柔軟なステップ管理**: State Patternによる明確な状態遷移
+- ✅ **イベント駆動**: Observer Patternによる疎結合な通信
+- ✅ **アニメーション**: スムーズなフェードイン/アウト
+- ✅ **カスタマイズ可能**: 矩形/円形スポットライト、位置指定、完了条件など
 
-## 構成要素
+## アーキテクチャ
 
-1. **TutorialManager**: チュートリアルの進行管理
-2. **TutorialOverlay**: 画面を暗くし、指定箇所だけ明るくする演出
-3. **TutorialModal**: 説明テキストを表示するウィンドウ
+### 設計パターン
+
+- **State Pattern**: チュートリアルの状態（idle/active/paused/completed/skipped）を明確に管理
+- **Observer Pattern**: EventEmitterを使用したイベント駆動通信
+- **Factory Pattern**: TutorialOverlayとTutorialModalの生成を分離
+- **関心の分離**: Manager（制御）、Overlay（ビジュアル）、Modal（UI）を完全に分離
+
+### ファイル構成
+
+```
+core/
+├── managers/
+│   └── TutorialManager.ts      # チュートリアル全体の進行管理
+├── ui/
+│   ├── TutorialOverlay.ts      # オーバーレイとスポットライト
+│   └── TutorialModal.ts        # チュートリアル用モーダル
+└── types/
+    └── tutorial.ts             # 型定義（循環参照回避）
+```
 
 ## 使い方
 
-### 1. 初期化
-
-シーンの `create` メソッドでインスタンス化します。
+### 基本的な使用例
 
 ```typescript
-import { TutorialManager } from "@/core/managers/TutorialManager";
-
-export class GameScene extends Phaser.Scene {
-    private tutorialManager: TutorialManager;
-
-    create() {
-        this.tutorialManager = new TutorialManager(this);
-
-        // 完了時の処理
-        this.tutorialManager.on("tutorial-complete", () => {
-            console.log("チュートリアル終了");
-        });
-    }
-}
-```
-
-### 2. ステップの定義と開始
-
-ステップデータの配列を渡して開始します。
-
-```typescript
+// チュートリアルを開始
 this.tutorialManager.start([
     {
         id: "step1",
-        text: "ここをクリックしてユニットを配置します",
+        text: "ようこそ！まずはこのボタンをクリックしてください",
         spotlightArea: {
             x: 100,
             y: 200,
-            width: 64,
-            height: 64,
+            width: 120,
+            height: 50,
             shape: "rectangle",
         },
-        modalPosition: "bottom",
-    },
-    {
-        id: "step2",
-        text: "敵を攻撃しましょう！",
-        spotlightArea: {
-            x: 300,
-            y: 200,
-            width: 100,
-            height: 100,
-            shape: "circle",
-        },
-        completeCondition: () => this.enemy.isDead(), // 条件達成で自動進行
-    },
+        modalPosition: "auto",
+    }
 ]);
 ```
 
-### 3. API
+## API リファレンス
 
-- `start(steps)`: チュートリアル開始
-- `nextStep()`: 次へ進む (手動)
-- `skip()`: 中断して終了
-- `pause() / resume()`: 一時停止/再開
+### TutorialStep
+- `id`: 一意のID
+- `text`: 表示テキスト
+- `spotlightArea`: スポットライトの座標とサイズ
+- `modalPosition`: モーダルの配置（auto/top/bottom/left/right）
+- `completeCondition`: 次のステップへ進むための条件関数
+- `onStart`: ステップ開始時のコールバック
+- `onComplete`: ステップ完了時のコールバック
 
-## カスタマイズ
-
-- **オーバーレイの色**: `TutorialOverlay.ts` の `overlayColor`, `overlayAlpha` を変更
-- **モーダルのデザイン**: `TutorialModal.ts` のスタイル設定を変更
+## 実装の詳細
+`TutorialOverlay` は `GeometryMask` を使用してスポットライトを実装します。モーダルの配置はスポットライトの位置に応じて自動計算されます。
