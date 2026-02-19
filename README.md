@@ -23,9 +23,12 @@ It includes a portable core framework (`src/core`) and a sample game implementat
 
 ## Documentation
 
-- `docs/guide/`: Development guides for beginners and advanced users.
-    - [BEGINNER_GUIDE.md](docs/guide/BEGINNER_GUIDE.md): Step-by-step guide for your first game.
-    - [ADVANCED_GUIDE.md](docs/guide/ADVANCED_GUIDE.md): Advanced patterns and best practices.
-    - [HISTORY_GUIDE.md](docs/guide/HISTORY_GUIDE.md): Guidelines for recording project changes.
-- `docs/history/`: Project change history (requirements, design, major implementations).
-- `docs/template/`: Templates for documentation and postmortems.
+- `docs/common/`: 共通ドキュメント（ガイド・テンプレート）。
+    - `guide/HISTORY_GUIDE.md`: 変更履歴の記録方法。
+    - `template/`: 各種設計・報告用テンプレート。
+- `docs/game/`: ゲーム開発特有のドキュメント。
+    - `guide/BEGINNER_GUIDE.md`: 初心者向けガイド。
+    - `guide/ADVANCED_GUIDE.md`: 上級者向けガイド。
+- `docs/app/`: プロジェクト固有のドキュメント。
+    - `history/`: プロジェクトの変更履歴（要件、設計、実装）。
+    - `guide/`: アプリケーション固有のガイド（任意）。

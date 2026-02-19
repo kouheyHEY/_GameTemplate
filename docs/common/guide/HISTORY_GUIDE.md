@@ -1,6 +1,6 @@
 # 変更履歴記録ガイド (History Recording Guide)
 
-このガイドでは、プロジェクトの変更履歴を `docs/history` に記録する方法を説明します。
+このガイドでは、プロジェクトの変更履歴を `docs/app/history` に記録する方法を説明します。
 
 ## 記録対象
 
@@ -137,7 +137,7 @@ YYYY-MM-DD_NN_変更内容の簡潔な説明.md
 
 ## 履歴サマリの作成
 
-履歴が複数溜まってきたら、`docs/history/SUMMARY.md` に全履歴の一覧とサマリを作成してください。
+履歴が複数溜まってきたら、`docs/app/history/SUMMARY.md` に全履歴の一覧とサマリを作成してください。
 
 ### サマリファイルの形式
 
@@ -167,5 +167,5 @@ YYYY-MM-DD_NN_変更内容の簡潔な説明.md
 
 ## 関連ドキュメント
 
-- [README.md](../../README.md) - プロジェクト概要
-- [ADVANCED_GUIDE.md](./ADVANCED_GUIDE.md) - 上級者向けガイド
+- [README.md](../../../README.md) - プロジェクト概要
+- [ADVANCED_GUIDE.md](../../game/guide/ADVANCED_GUIDE.md) - 上級者向けガイド
