@@ -32,4 +32,7 @@ It includes a portable core framework (`src/core`) and a sample game implementat
     - [ADVANCED_GUIDE.md](docs/game/guide/ADVANCED_GUIDE.md): 上級者向けガイド。
 - `docs/app/`: プロジェクト固有のドキュメント。
     - `history/`: プロジェクトの変更履歴（要件、設計、実装）。
-    - `guide/`: アプリケーション固有のガイド（任意）。
+    - `plan/`: ロードマップ・TODO。
+- `docs/work/`: 作業用・一時ドキュメント（メモ・下書き）。
+    - `plan/`: タスク設計・手順。
+    - `history/`: ブレインストーミング・作業スクラップ。
